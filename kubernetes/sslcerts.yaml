@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Secret
+data:
+  tls.crt: REPLACE-ME
+  tls.key: REPLACE-ME
+metadata:
+  name: sslcerts-wasmerspeed
+  namespace: default
+type: Opaque

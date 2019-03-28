@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: wasmerspeed
+  labels:
+    app: wasmerspeed
+spec:
+  template:
+    metadata:
+      labels:
+        app: wasmerspeed
+    spec:
+      containers:
+        - name: wasmerspeed
+          image: gcr.io/wasmer/wasmerspeed:latest
+          ports:
+            - containerPort: 8080
+          env:
+            # - name: DATABASE_URL
+            #   value: sqlite:///db.sqlite3
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: wasmerspeed-secrets
+                  key: DATABASE_URL
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wasmerspeed-secrets
+                  key: SECRET_KEY
+          resources:
+            requests:
+              cpu: "0.05"
+
+        # [START proxy_container]
+        - name: cloudsql-proxy
+          image: gcr.io/cloudsql-docker/gce-proxy:1.11
+          command:
+            [
+              "/cloud_sql_proxy",
+              "-instances=wasmer:us-central1:wasmer-db=tcp:5432",
+              "-credential_file=/secrets/cloudsql/credentials.json",
+            ]
+          volumeMounts:
+            - name: cloudsql-instance-credentials
+              mountPath: /secrets/cloudsql
+              readOnly: true
+          resources:
+            requests:
+              cpu: "0.05"
+
+        # [END proxy_container]
+      # [START volumes]
+      volumes:
+        - name: cloudsql-instance-credentials
+          secret:
+            secretName: cloudsql-instance-credentials
+      # [END volumes]

@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tls-ingress-wasmerspeed
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "wasmerspeed-ip"
+spec:
+  tls:
+  - secretName: sslcerts-wasmerspeed
+  backend:
+    serviceName: wasmerspeed
+    servicePort: 8080

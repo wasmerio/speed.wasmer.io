@@ -1,7 +1,7 @@
 PROJECT_ID = wasmer
 ZONE = us-central1-b
 GIT_VERSION := $(shell git rev-parse --short HEAD)
-CLUSTER = wasmer-cluster
+CLUSTER = wasmer-cluster-prod
 POD_NAME = wasmerspeed
 HOST_IP := $(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
 
@@ -24,10 +24,10 @@ publish_image: init_gcloud image
 init_cluster: init_gcloud
 	# First we create the cluster
 	# Then we create the service
-	kubectl run ${POD_NAME} --image=gcr.io/${PROJECT_ID}/wasmerspeed:${GIT_VERSION} --port 8080
-	kubectl apply -f deployment.yaml
-	kubectl apply -f ingress.yaml
-	kubectl apply -f service.yaml
+	# kubectl run ${POD_NAME} --image=gcr.io/${PROJECT_ID}/wasmerspeed:${GIT_VERSION} --port 8080
+	kubectl apply -f kubernetes/deployment.yaml
+	kubectl apply -f kubernetes/ingress.yaml
+	kubectl apply -f kubernetes/service.yaml
 	# And expose this service in the load balancer
 	# kubectl expose deployment ${POD_NAME} --type=LoadBalancer --port 8080 --target-port 8080
 	# kubectl expose deployment ${POD_NAME} --type=LoadBalancer --port 3000 --target-port 3000
@@ -41,7 +41,7 @@ generate_secrets:
 	kubectl create secret generic wasmerspeed-secrets --from-env-file=./.env.prod
 
 update_deployment: init_gcloud image publish_image
-	kubectl apply -f deployment.yaml
+	kubectl apply -f kubernetes/deployment.yaml
 	kubectl set image deployment/${POD_NAME} wasmerspeed=gcr.io/${PROJECT_ID}/wasmerspeed:${GIT_VERSION}
 
 # delete_cluster: init_gcloud

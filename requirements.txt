@@ -2,3 +2,4 @@ Django==2.1.7
 sentry-sdk==0.7.7
 codespeed==0.13.0
 django-environ==0.4.5
+isodate==0.6.0

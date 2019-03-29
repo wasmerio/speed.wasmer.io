@@ -17,6 +17,7 @@ env = environ.Env(
     DEBUG=(bool, False),
     SECRET_KEY=(str, "default-secret-key"),
     DATABASE_URL=(str, "sqlite:///db.sqlite3"),
+    USE_SSL=(bool, False),
 )
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -142,6 +143,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Codespeed settings that can be overwritten here.
 from codespeed.settings import *
 
+# Redirect https automatically to the new website
+SECURE_SSL_REDIRECT = env('USE_SSL')
 
 # Sentry, for error reporting
 import sentry_sdk
